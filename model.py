@@ -1,3 +1,4 @@
+import os.path
 from typing import List, Tuple, Optional
 
 
@@ -74,4 +75,16 @@ class ScheduleFCFS(ScheduleMother):
         if not self.calc:
             self._calc()
         return self.gant_output.copy()
+
+
+def read_from_file(filename: str):
+    if not os.path.exists(filename):
+        raise FileNotFoundError(f"File Not Found: {filename}")
+    res = []
+    with open(filename, 'r') as file:
+        for line in file:
+            name, enter, calc = line.split()
+            res.append(Process(name, int(enter), int(calc)))
+    return res
+
 
