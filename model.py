@@ -88,3 +88,11 @@ def read_from_file(filename: str):
     return res
 
 
+def write_to_file(filename: str, objects: List, *attributes):
+    with open(filename, "w") as file:
+        for obj in objects:
+            lst = []
+            for attr in attributes:
+                lst.append(getattr(obj, attr))
+            file.write(" ".join(str(i) for i in lst))
+            file.write("\n")
