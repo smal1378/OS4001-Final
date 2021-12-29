@@ -67,7 +67,7 @@ def ask_options(message: str, options: List[Tuple[str, Any]]):
         print("Didn't Match!")
 
 
-def say_string(*args, **kwargs):
+def say(*args, **kwargs):
     f = io.StringIO()
     with redirect_stdout(f):
         print(*args, **kwargs)
@@ -85,3 +85,10 @@ def draw_gant(datas: List[Tuple[int, str]], zoom: int = 1):
     for time, name in datas:
         print("|\t|\n" * ((time - last_one) // zoom), end="")
         print(f"  T: {time}, P: {name}")
+
+
+def say_warning(message: str):
+    say_seperator()
+    say("\t\tWARNING")
+    say(message)
+    say_seperator()
