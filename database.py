@@ -13,19 +13,21 @@ class Database:
     _dict = {}
 
     def __new__(cls, *args, **kwargs):
-        filename = ""
         if len(args) >= 1:
             filename = args[0]
         elif 'filename' in kwargs:
             filename = kwargs['filename']
-        if not filename or filename not in Database._dict:
+        else:
+            filename = "database"
+        filename = os.path.abspath(filename)
+        if filename not in Database._dict:
             return super(Database, cls).__new__(cls)
         return Database._dict[filename]
 
     def __init__(self, filename: str = "database"):
         self.filename = os.path.abspath(filename)
         if self.filename in Database._dict:
-            raise SystemError("Oops, This shouldn't ever happen!")
+            return  # This is not a new obj!
         Database._dict[self.filename] = self
         self._change_flag: bool = False
         self._change_header_flag: bool = False
