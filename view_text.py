@@ -93,3 +93,7 @@ def say_warning(message: str):
     say("\t\tWARNING")
     say(message)
     say_seperator()
+
+
+def wait_for_enter(before: str = '\n'):
+    ask_string(f"{before}Waiting to press 'ENTER'..")
