@@ -30,7 +30,7 @@ def ask_integer(message: str) -> Optional[int]:
     inp = input(message)
     if not inp:
         return None
-    while inp.isnumeric():
+    while not inp.isnumeric():
         print("Enter Integer Please, Or empty for cancel")
         inp = input(message)
         if not inp:
