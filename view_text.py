@@ -84,8 +84,8 @@ def say_seperator():
 def draw_gant(datas: List[Tuple[int, str]], zoom: int = 1):
     last_one = 0
     for time, name in datas:
-        print("|\t|\n" * ((time - last_one) // zoom), end="")
-        print(f"  T: {time}, P: {name}")
+        print("|\t\t|\n" * (((time - last_one) // zoom) - 1), end="")
+        print("|\t\t|", f"  T: {time}, P: {name}")
 
 
 def say_warning(message: str):
