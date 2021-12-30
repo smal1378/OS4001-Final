@@ -12,6 +12,8 @@ def _insert_break_line(inp: str, interval: int = None,
     res = f"{start_line}"
     a = 0
     while a < len(inp):
+        if a + interval > len(inp):
+            end_line = ""
         res += inp[a:a+interval] + f"{end_line}\n{start_line}"
         a += interval
     res += inp[a:]
@@ -51,8 +53,7 @@ def ask_options(message: str, options: List[Tuple[str, Any]]):
     for name, value in options:
         values.append(value)
         names.append(name)
-    res = " - "
-    res.join(name_generator())
+    res = " - ".join(name_generator())
     print(_insert_break_line(res, start_line="\t"))
     while True:
         inp = input("Name Or Number Of Your Option:")
@@ -73,7 +74,7 @@ def say(*args, **kwargs):
         print(*args, **kwargs)
     out = f.getvalue()
     _insert_break_line(out)
-    print(out)
+    print(out, end="")
 
 
 def say_seperator():
