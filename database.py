@@ -83,7 +83,7 @@ class Database:
         for node in self._header:
             yield node.key
 
-    def flash(self):
+    def flush(self):
         """
         Flushes buffer and saves everything to file
         """
@@ -111,5 +111,5 @@ class Database:
         """
         Clears memory cache to avoid extra memory usage.
         """
-        self.flash()  # save everything
+        self.flush()  # save everything
         self._values.clear()  # delete cache
