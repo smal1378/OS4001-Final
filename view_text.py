@@ -86,6 +86,7 @@ def draw_gant(datas: List[Tuple[int, str]], zoom: int = 1):
     for time, name in datas:
         print("|\t\t|\n" * (((time - last_one) // zoom) - 1), end="")
         print("|\t\t|", f"  T: {time}, P: {name}")
+        last_one = time
 
 
 def say_warning(message: str):
