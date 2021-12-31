@@ -39,6 +39,9 @@ def ask_integer(message: str) -> Optional[int]:
 
 
 def ask_options(message: str, options: List[Tuple[str, Any]]):
+    if len(options) == 1:
+        return options[0][1]
+
     def name_generator():
         a = 1
         for name1 in names:
