@@ -47,7 +47,7 @@ def ask_options(message: str, options: List[Tuple[str, Any]]):
 
     message = _insert_break_line(message)
     print(message)
-    print("Options:")
+    print("Options:  ", end="")
     values = []
     names = []
     for name, value in options:
