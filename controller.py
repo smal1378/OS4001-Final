@@ -1,6 +1,7 @@
 from database import Database
 import view_text as ui
 from model import read_from_file, ScheduleMother, write_to_file
+from view import Panel
 
 data = Database()
 if "UI" not in data:
@@ -22,6 +23,7 @@ if data["UI"] == "TEXT":
         op = ui.ask_options("What to do:", [('exit', None),
                                             ('show gant chart', 1),
                                             ('show output file', 2),
+                                            ('switch to gui', 3)
                                             ],)
         if op is None:
             break
@@ -37,6 +39,24 @@ if data["UI"] == "TEXT":
             with open("Output.txt") as file:
                 for line in file:
                     ui.say(*line.strip().split(), sep="\t\t\t")
+        elif op == 3:
+            data["UI"] = "GUI"
+            break
         # the exit 'elif' will break the while then saves and exits...
+if data['UI'] == "GUI":  # it's an if, because if the text-mode exits by setting 'UI' to 'GUI', it'll start
+    def schedule_callback(scheduler_name: str, file_name: str):
+        # file_name exists checked in gui
+        scheduler1 = schedulers_list[schedulers_name.index(scheduler_name)]()
+        processes1 = read_from_file(file_name)
+        for pro in processes1:
+            scheduler1.add_process(pro)
+        return scheduler1.get_output(), scheduler1.get_gant()
+    schedulers_list = ScheduleMother.__subclasses__()
+    schedulers_name = [x.name for x in ScheduleMother.__subclasses__()]
+    win = Panel(
+        schedule_callback,
+        schedulers_name
+    )
+    win.mainloop()
 
 data.flush()
