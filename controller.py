@@ -1,6 +1,6 @@
 from database import Database
 import view_text as ui
-from model import read_from_file, ScheduleFCFS, write_to_file
+from model import read_from_file, ScheduleMother, write_to_file
 
 data = Database()
 if "UI" not in data:
@@ -12,7 +12,7 @@ if data["UI"] == "TEXT":
     if not filename:
         filename = 'SampleTest.txt'
     processes = read_from_file(filename)
-    scheduler = ScheduleFCFS()
+    scheduler = ui.ask_options("Choose Your Scheduler:", [(i.name, i) for i in ScheduleMother.__subclasses__()])()
     for process in processes:
         scheduler.add_process(process)
     write_to_file("Output.txt", scheduler.get_output(), "name", "response", "waiting")
@@ -24,7 +24,7 @@ if data["UI"] == "TEXT":
                                             ('show output file', 2),
                                             ],)
         if op is None:
-            exit()
+            break
         elif op == 1:
             z = ui.ask_integer("Gant Zoom Scale? (1 to 50 or 'enter' for 2)")
             if not z:
@@ -37,3 +37,6 @@ if data["UI"] == "TEXT":
             with open("Output.txt") as file:
                 for line in file:
                     ui.say(*line.strip().split(), sep="\t\t\t")
+        # the exit 'elif' will break the while then saves and exits...
+
+data.flush()
