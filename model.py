@@ -24,6 +24,8 @@ class ScheduleMother:
         Mother Class Of Process Schedulers.
         Each Scheduling Method Should Be Defined By Creating A Subclass Of This Class.
     """
+    name = ""  # name of scheduler
+
     def add_process(self, process: Process):
         raise NotImplemented
 
@@ -43,6 +45,8 @@ class ScheduleMother:
 
 
 class ScheduleFCFS(ScheduleMother):
+    name = "FCFS"  # name of scheduler
+
     def __init__(self):
         self.processes = []
         self.gant_output = []
