@@ -78,14 +78,35 @@ class Panel(_Tk):
                                                     process.waiting,
                                                     process.response))
 
-                self.canvas.delete("all")
-                self.canvas.create_rectangle(2, 2, 1000, 30, fill="#efefef")
-                maxi = gant_data[-1][0]  # is the maximum
-                for start, name in gant_data:
-                    scale = int((start / maxi) * 1000)
-                    self.canvas.create_line(scale, 2, scale, 30)
-                    if name != "END":
-                        self.canvas.create_text(scale, 30, text=name)
+            self.canvas.delete("all")
+            height = 0
+            iterator = iter(gant_data)
+            row_size = 15
+            width = 1000
+            self.canvas.config(width=width, height=30*((len(gant_data)-2)//row_size)+40)
+            for row in range(((len(gant_data)-2)//row_size)+1):
+                mini = gant_data[row*row_size][0]
+                if (row+1)*row_size < len(gant_data):
+                    maxi = gant_data[(row+1)*row_size][0]  # is the maximum
+                else:
+                    maxi = gant_data[-1][0]
+                height += 30
+                self.canvas.create_rectangle(2, height-28, width, height, fill="#efefef")
+                start, name = next(iterator)
+                start -= mini
+                scale = int((start / maxi) * width)
+                for _, (next_start, next_name) in zip(range(row_size-1), iterator):
+                    next_start -= mini
+                    next_scale = int((next_start / maxi) * width)
+                    self.canvas.create_line(scale, row*30+2, scale, height)
+                    self.canvas.create_text((scale + next_scale)//2, (2*height-30)//2, text=name)
+                    scale = next_scale
+                    start, name = next_start, next_name
+                if name != 'END':
+                    self.canvas.create_line(scale, row*30+2, scale, height)
+                    self.canvas.create_text((scale + width)//2, (2*height-30)//2, text=name)
+                else:
+                    self.canvas.create_line(scale, row * 30 + 2, scale, height)
 
     @staticmethod
     def validate_filename(e):
