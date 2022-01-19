@@ -84,7 +84,8 @@ class Panel(_Tk):
                 for start, name in gant_data:
                     scale = int((start / maxi) * 1000)
                     self.canvas.create_line(scale, 2, scale, 30)
-                    self.canvas.create_text(scale, 30, text=name)
+                    if name != "END":
+                        self.canvas.create_text(scale, 30, text=name)
 
     @staticmethod
     def validate_filename(e):

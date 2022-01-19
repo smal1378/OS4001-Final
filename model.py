@@ -68,6 +68,7 @@ class ScheduleFCFS(ScheduleMother):
             time += process.calc
             process.response = time - process.enter  # exit time - enter time
             process.waiting = time - process.calc - process.enter  # exit - calculate time - enter
+        self.gant_output.append((time, 'END'))
         self.calc = True
 
     def get_output(self) -> List[Process]:
