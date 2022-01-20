@@ -99,12 +99,14 @@ class Panel(_Tk):
                     next_start -= mini
                     next_scale = int((next_start / maxi) * width)
                     self.canvas.create_line(scale, row*30+2, scale, height)
-                    self.canvas.create_text((scale + next_scale)//2, (2*height-30)//2, text=name)
+                    if name != "QUANT":
+                        self.canvas.create_text((scale + next_scale)//2, (2*height-30)//2, text=name)
                     scale = next_scale
                     start, name = next_start, next_name
                 if name != 'END':
                     self.canvas.create_line(scale, row*30+2, scale, height)
-                    self.canvas.create_text((scale + width)//2, (2*height-30)//2, text=name)
+                    if name != 'QUANT':
+                        self.canvas.create_text((scale + width)//2, (2*height-30)//2, text=name)
                 else:
                     self.canvas.create_line(scale, row * 30 + 2, scale, height)
 
