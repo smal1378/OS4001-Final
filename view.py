@@ -90,6 +90,7 @@ class Panel(_Tk):
                     maxi = gant_data[(row+1)*row_size][0]  # is the maximum
                 else:
                     maxi = gant_data[-1][0]
+                maxi -= mini
                 height += 30
                 self.canvas.create_rectangle(2, height-28, width, height, fill="#efefef")
                 start, name = next(iterator)
