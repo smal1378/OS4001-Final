@@ -82,6 +82,50 @@ class ScheduleFCFS(ScheduleMother):
         return self.gant_output.copy()
 
 
+class ScheduleRR(ScheduleMother):
+    name = 'RR'
+
+    def __init__(self, quant: int = 10, change_time: int = 2):
+        self.processes: List[Process] = []
+        self.gant_chart = []
+        self._quant = quant
+        self._change_time = change_time
+        self._is_calc = False
+
+    def add_process(self, process: Process):
+        self.processes.append(process)
+        self._is_calc = False
+
+    def get_output(self) -> List[Process]:
+        if not self._is_calc:
+            self._calc()
+        return self.processes.copy()
+
+    def get_gant(self):
+        if not self._is_calc:
+            self._calc()
+        return self.gant_chart
+
+    def _calc(self):
+        self.gant_chart.clear()
+        if not self.processes:
+            return
+        queue: List[Tuple[Process, int]] = [(i, i.calc) for i in sorted(self.processes, key=lambda e: e.enter)]
+        time = queue[0][0].enter
+        while queue:
+            process, left_time = queue.pop(0)
+            self.gant_chart.append((time, process.name))
+            if left_time <= self._quant:
+                time += left_time
+                process.response = time - process.enter  # exit time - enter time
+                process.waiting = time - process.calc - process.enter  # exit - calculate time - enter
+            else:
+                time += self._quant
+                queue.append((process, left_time-self._quant))
+            self.gant_chart.append((time, 'QUANT'))
+            time += self._change_time
+
+
 def read_from_file(filename: str):
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File Not Found: {filename}")
