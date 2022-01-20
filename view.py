@@ -110,6 +110,7 @@ class Panel(_Tk):
                         self.canvas.create_text((scale + width)//2, (2*height-30)//2, text=name)
                 else:
                     self.canvas.create_line(scale, row * 30 + 2, scale, height)
+                    break
 
     @staticmethod
     def validate_filename(e):
