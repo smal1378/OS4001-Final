@@ -124,6 +124,8 @@ class ScheduleRR(ScheduleMother):
                 queue.append((process, left_time-self._quant))
             self.gant_chart.append((time, 'QUANT'))
             time += self._change_time
+        self.gant_chart.pop()
+        self.gant_chart.append((time-self._change_time, "END"))
 
 
 def read_from_file(filename: str):
