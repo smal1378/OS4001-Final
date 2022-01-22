@@ -237,6 +237,56 @@ class ScheduleSRT(ScheduleMother):
         queue.append((time_left, element))
 
 
+class ScheduleHRRN(ScheduleMother):
+    name = "HRRN"
+
+    def __init__(self):
+        self.queue1: List[Process] = []
+        self.gant_chart = []
+        self._is_calc = False
+
+    def get_gant(self):
+        if not self._is_calc:
+            self._calc()
+        return self.gant_chart
+
+    def add_process(self, process: Process):
+        self.queue1.append(process)
+        self._is_calc = False
+
+    def get_output(self):
+        if not self._is_calc:
+            self._calc()
+        return self.queue1.copy()
+
+    def _calc(self):
+        self.gant_chart.clear()
+        self._is_calc = True
+        queue1: List[Process] = sorted(self.queue1, key=lambda e: e.enter)
+        priority_queue = []
+        time = queue1[0].enter
+        while queue1 or priority_queue:
+            while queue1 and queue1[0].enter <= time:
+                self._priority_add_helper(priority_queue, queue1.pop(0), time)
+            elem = priority_queue.pop(0)
+            self.gant_chart.append((time, elem.name))
+            time += elem.calc
+            elem.response = time - elem.enter  # exit time - enter time
+            elem.waiting = time - elem.calc - elem.enter  # exit - calculate time - enter
+        self.gant_chart.append((time, "END"))
+
+    @staticmethod
+    def _priority_add_helper(queue: List[Process], element: Process, time: int = 0):
+        w1 = ((time - element.enter) + element.calc) / element.calc
+        if queue:
+            for index, elem in enumerate(queue):
+                w2 = ((time - elem.enter) + elem.calc) / elem.calc
+                if w1 > w2:
+                    queue.insert(index, element)
+                    return
+        queue.append(element)
+
+
 def read_from_file(filename: str):
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File Not Found: {filename}")
