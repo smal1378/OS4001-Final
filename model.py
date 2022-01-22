@@ -128,6 +128,65 @@ class ScheduleRR(ScheduleMother):
         self.gant_chart.append((time-self._change_time, "END"))
 
 
+class ScheduleSJF(ScheduleMother):
+    name = "SJF/SPN"
+
+    def __init__(self):
+        self.queue1: List[Process] = []
+        self.gant_chart = []
+        self._is_calc = False
+
+    def get_gant(self):
+        if not self._is_calc:
+            self._calc()
+        return self.gant_chart
+
+    def add_process(self, process: Process):
+        self.queue1.append(process)
+        self._is_calc = False
+
+    def get_output(self):
+        if not self._is_calc:
+            self._calc()
+        return self.queue1.copy()
+
+    def _calc(self):
+        self.gant_chart.clear()
+        self._is_calc = True
+        queue1 = sorted(self.queue1, key=lambda e: e.enter)
+        priority_queue = []
+        time = queue1[0].enter
+        old_elem = None
+        while queue1 or priority_queue:
+            while queue1 and queue1[0].enter <= time:
+                self._priority_add_helper(priority_queue, queue1.pop(0))
+            time_left, elem = priority_queue.pop(0)
+            if (old_elem and old_elem is not elem) or not old_elem:  # not elem is for first time
+                self.gant_chart.append((time, elem.name))
+            old_elem = elem
+            if queue1 and queue1[0].enter < time_left+time:
+                step = queue1[0].enter - time
+                time += step
+                self._priority_add_helper(priority_queue, elem, time_left-step)
+            else:
+                # this should end for because it's our first priority
+                time += time_left
+                elem.response = time - elem.enter  # exit time - enter time
+                elem.waiting = time - elem.calc - elem.enter  # exit - calculate time - enter
+        self.gant_chart.append((time, "END"))
+
+    @staticmethod
+    def _priority_add_helper(queue: List[Tuple[int, Process]], element: Process, time_left: int = 0):
+        if time_left == 0:
+            time_left = element.calc
+        if queue:
+            for index, (time_left1, elem) in enumerate(queue):
+                if time_left1 > time_left:
+                    queue.insert(index, (time_left, element))
+                    return
+        queue.append((time_left, element))
+
+
 def read_from_file(filename: str):
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File Not Found: {filename}")
