@@ -3,7 +3,7 @@ import os.path
 from tkinter import Tk as _Tk, Label as _Label, Button as _Button, Frame as _Frame,\
     LabelFrame as _LabelFrame, StringVar as _StringVar, Entry as _Entry, Canvas as _Canvas
 from tkinter.ttk import Treeview as _Treeview, Combobox as _Combobox
-from typing import List, Callable, Tuple
+from typing import List, Callable, Tuple, Optional
 from model import Process
 from database import Database
 
@@ -18,6 +18,7 @@ class Panel(_Tk):
         self.title("OS4001 Project - Mahjoor & Eslami")
         self.geometry("1100x600")
         self.config(bg="white")
+        self.processes: Optional[List[Process]] = None
         mother = _Frame(self, bd=1, relief="solid", bg="white")
         mother.grid(row=1, column=1, padx=5, pady=5)
         up = _Frame(mother, bg="white")
@@ -43,15 +44,15 @@ class Panel(_Tk):
                               show="headings", selectmode="none")
         self.tree.grid(row=2, column=1, padx=10, pady=10, sticky="w")
         tree = self.tree
-        tree.heading('Name', text="Name", anchor="w")
+        tree.heading('Name', text="Name", anchor="w", command=self.sort_name)
         tree.column("Name", width=100)
-        tree.heading('Enter', text="Enter", anchor="w")
+        tree.heading('Enter', text="Enter", anchor="w", command=self.sort_enter)
         tree.column("Enter", width=75)
-        tree.heading('Calc', text="Calc", anchor="w")
+        tree.heading('Calc', text="Calc", anchor="w", command=self.sort_calc)
         tree.column("Calc", width=75)
-        tree.heading('Wait', text="Wait", anchor="w")
+        tree.heading('Wait', text="Wait", anchor="w", command=self.sort_wait)
         tree.column("Wait", width=75)
-        tree.heading('Response', text="Response", anchor="w")
+        tree.heading('Response', text="Response", anchor="w", command=self.sort_response)
         tree.column("Response", width=75)
         gant_frame = _LabelFrame(mother, text="Gant Chart", bg="white")
         gant_frame.grid(row=2, column=1, padx=5, pady=5)
@@ -59,6 +60,52 @@ class Panel(_Tk):
         self.canvas.grid(row=1, column=1, padx=5, pady=5)
         _Button(mother, text="text-mode", command=self.exit_to_text,
                 bg="white", relief="solid", bd=1).grid(row=3, column=1, padx=5, sticky="e")
+        self.sort_by = None
+
+    def sort_name(self):
+        reverse = True if self.sort_by == "name" else False
+        self.sort_by = "name"
+        if self.processes:
+            self.tree.delete(*self.tree.get_children(""))
+            for process in sorted(self.processes, key=lambda e: e.name, reverse=reverse):
+                self.tree.insert("", "end", values=(process.name, process.enter, process.calc,
+                                                    process.waiting, process.response))
+
+    def sort_enter(self):
+        reverse = True if self.sort_by == "enter" else False
+        self.sort_by = "enter"
+        if self.processes:
+            self.tree.delete(*self.tree.get_children(""))
+            for process in sorted(self.processes, key=lambda e: e.enter, reverse=reverse):
+                self.tree.insert("", "end", values=(process.name, process.enter, process.calc,
+                                                    process.waiting, process.response))
+
+    def sort_calc(self):
+        reverse = True if self.sort_by == "calc" else False
+        self.sort_by = "calc"
+        if self.processes:
+            self.tree.delete(*self.tree.get_children(""))
+            for process in sorted(self.processes, key=lambda e: e.calc, reverse=reverse):
+                self.tree.insert("", "end", values=(process.name, process.enter, process.calc,
+                                                    process.waiting, process.response))
+
+    def sort_wait(self):
+        reverse = True if self.sort_by == "wait" else False
+        self.sort_by = "wait"
+        if self.processes:
+            self.tree.delete(*self.tree.get_children(""))
+            for process in sorted(self.processes, key=lambda e: e.waiting, reverse=reverse):
+                self.tree.insert("", "end", values=(process.name, process.enter, process.calc,
+                                                    process.waiting, process.response))
+
+    def sort_response(self):
+        reverse = True if self.sort_by == "response" else False
+        self.sort_by = "response"
+        if self.processes:
+            self.tree.delete(*self.tree.get_children(""))
+            for process in sorted(self.processes, key=lambda e: e.response, reverse=reverse):
+                self.tree.insert("", "end", values=(process.name, process.enter, process.calc,
+                                                    process.waiting, process.response))
 
     def exit_to_text(self):
         d = Database()
@@ -77,7 +124,7 @@ class Panel(_Tk):
                                                     process.calc,
                                                     process.waiting,
                                                     process.response))
-
+            self.processes = processes
             self.canvas.delete("all")
             height = 0
             iterator = iter(gant_data)
