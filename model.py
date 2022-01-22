@@ -128,8 +128,8 @@ class ScheduleRR(ScheduleMother):
         self.gant_chart.append((time-self._change_time, "END"))
 
 
-class ScheduleSJF(ScheduleMother):
-    name = "SJF/SPN"
+class ScheduleSRT(ScheduleMother):
+    name = "SRT"
 
     def __init__(self):
         self.queue1: List[Process] = []
