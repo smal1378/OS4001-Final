@@ -287,6 +287,76 @@ class ScheduleHRRN(ScheduleMother):
         queue.append(element)
 
 
+class ScheduleFB(ScheduleMother):
+    name = "FB"
+
+    def __init__(self):
+        self.processes: List[Process] = []
+        self.gant_chart = []
+        self._is_calc = False
+
+    def get_gant(self):
+        if not self._is_calc:
+            self._calc()
+        return self.gant_chart
+
+    def add_process(self, process: Process):
+        self.processes.append(process)
+        self._is_calc = False
+
+    def get_output(self):
+        if not self._is_calc:
+            self._calc()
+        return self.processes.copy()
+
+    def _calc(self):
+        self.gant_chart.clear()
+        self._is_calc = True
+        quant = 5
+        time = 0
+        queue_all = sorted(self.processes, key=lambda e: e.enter)
+        queue1: List[Tuple[int ,Process]] = []  # first priority - FCFS
+        queue2: List[Tuple[int, Process]] = []  # second priority - FCFS
+        queue3: List[Tuple[int, Process]] = []  # last priority - RR
+        while any((queue1, queue2, queue3, queue_all)):
+            while queue_all and time >= queue_all[0].enter:
+                element = queue_all.pop(0)
+                queue1.append((element.calc, element))
+            if queue1:
+                time_left, element = queue1.pop(0)
+                self.gant_chart.append((time, element.name))
+                if time_left > quant:
+                    time += quant
+                    queue2.append((time_left-quant, element))
+                else:
+                    time += time_left
+                    element.response = time - element.enter  # exit time - enter time
+                    element.waiting = time - element.calc - element.enter  # exit - calculate time - enter
+            elif queue2:
+                time_left, element = queue2.pop(0)
+                self.gant_chart.append((time, element.name))
+                if time_left > quant:
+                    time += quant
+                    queue3.append((time_left - quant, element))
+                else:
+                    time += time_left
+                    element.response = time - element.enter  # exit time - enter time
+                    element.waiting = time - element.calc - element.enter  # exit - calculate time - enter
+            elif queue3:
+                time_left, element = queue3.pop(0)
+                self.gant_chart.append((time, element.name))
+                if time_left > quant:
+                    time += quant
+                    queue3.append((time_left - quant, element))
+                else:
+                    time += time_left
+                    element.response = time - element.enter  # exit time - enter time
+                    element.waiting = time - element.calc - element.enter  # exit - calculate time - enter
+            else:
+                time += 1  # if no element was available at queues
+        self.gant_chart.append((time, "END"))
+
+
 def read_from_file(filename: str):
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File Not Found: {filename}")
